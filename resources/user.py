@@ -1,6 +1,10 @@
 from flask_restful import Resource, reqparse
 from models.user import UserModel
 from error import Error
+from werkzeug.security import safe_str_cmp
+from flask_jwt_extended import (jwt_required,
+                                create_access_token,
+                                create_refresh_token)
 
 _parser = reqparse.RequestParser()
 _parser.add_argument('email',
@@ -38,9 +42,9 @@ class UserRegister(Resource):
         if UserModel.get_user_from_email(data['email']):
             print("USER ALREADY EXISTS")
             return {
-                "errorCode": Error.USER_ALREADY_EXISTS,
-                "message": "User already registered"
-            }, 400
+                       "errorCode": Error.USER_ALREADY_EXISTS,
+                       "message": "User already registered"
+                   }, 400
         print("NEW USER")
         new_user: UserModel = UserModel(data['email'], data['password'], data['mobile'])
         try:
@@ -48,7 +52,32 @@ class UserRegister(Resource):
 
         except:
             return {
-                "errorCode": Error.REGISTRATION_FAILED,
-                "message": "Failed to register user, please try after sometime"
-            }, 500
+                       "errorCode": Error.REGISTRATION_FAILED,
+                       "message": "Failed to register user, please try after sometime"
+                   }, 500
         return {"message": "You have registered successfully"}, 201
+
+
+class UserLogin(Resource):
+    def post(self):
+        data = _parser.parse_args()
+        try:
+            user = UserModel.get_user_from_email(data['email'])
+            if user and safe_str_cmp(user.password, data['password']):
+                access_token = create_access_token(identity=user.id, fresh=True)
+                refresh_token = create_refresh_token(identity=user.id)
+                return {
+                           "access_token": access_token,
+                           "refresh_token": refresh_token
+                       }, 200
+            else:
+                return {
+                           "errorCode": Error.INVALID_CREDENTIAL,
+                           "message": "Invalid Credential"
+                       }, 400
+
+        except:
+            return {
+                       "errorCode": Error.FAILED_TO_LOGIN,
+                       "message": "There is problem while login, please try after some time"
+                   }, 500
