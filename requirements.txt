@@ -1,0 +1,5 @@
+#These are the library develper must install before running the server
+Flask
+Flask-RESTful
+Flask-JWT-Extended
+Flask-SQLAlchemy
