@@ -81,3 +81,8 @@ class UserLogin(Resource):
                        "errorCode": Error.FAILED_TO_LOGIN,
                        "message": "There is problem while login, please try after some time"
                    }, 500
+
+class UserLogout(Resource):
+    @jwt_required
+    def post(self):
+        pass
