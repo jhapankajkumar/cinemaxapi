@@ -1,9 +1,8 @@
 from db import db
 
 
-class FavouriteModel(db.Model):
-
-    __tablename__ = "favourites"
+class WatchModel(db.Model):
+    __tablename__ = "watchlist"
 
     id = db.Column(db.Integer, primary_key=True)
     media_type = db.Column(db.String(80))
@@ -66,23 +65,23 @@ class FavouriteModel(db.Model):
         db.session.commit()
 
     @classmethod
-    def get_favourites(cls, user_id, media_type):
-        return cls.query.filter_by(user_id= user_id,
+    def get_watchlist(cls, user_id, media_type):
+        return cls.query.filter_by(user_id=user_id,
                                    media_type=media_type)
 
     @classmethod
-    def get_favourite(cls, user_id,media_type, media_id):
+    def get_watch_item(cls, user_id, media_type, media_id):
 
         return cls.query.filter_by(user_id=user_id,
                                    media_type=media_type,
                                    id=media_id).first()
 
     @classmethod
-    def is_favourite(cls, user_id, media_id):
+    def is_added_to_watchlist(cls, user_id, media_id):
         return cls.query.filter_by(user_id=user_id,
                                    id=media_id).first()
 
 
 
-    
+
 

@@ -3,6 +3,7 @@ from models.user import UserModel
 from error import Error
 from werkzeug.security import safe_str_cmp
 from flask_jwt_extended import (jwt_required,
+                                get_jwt_identity,
                                 create_access_token,
                                 create_refresh_token)
 
@@ -22,11 +23,18 @@ _parser.add_argument('mobile',
                      required=False
                      )
 
+_parser.add_argument('name',
+                     type=str,
+                     required=True,
+                     help="Name can not be empty"
+                     )
+
 
 class UserRegister(Resource):
     def post(self):
         # get data from parser
         data = _parser.parse_args()
+        print("NAME", data['name'])
         print("EMAIL", data['email'])
         print("PASSWORD", data['password'])
         print("MOBILE", data['mobile'])
@@ -46,16 +54,29 @@ class UserRegister(Resource):
                        "message": "User already registered"
                    }, 400
         print("NEW USER")
-        new_user: UserModel = UserModel(data['email'], data['password'], data['mobile'])
+        new_user: UserModel = UserModel(data['name'], data['email'], data['password'], data['mobile'])
         try:
             new_user.save_to_db()
 
         except:
             return {
-                       "errorCode": Error.REGISTRATION_FAILED,
+                       "errorCode": Error.USER_REGISTRATION_FAILED,
                        "message": "Failed to register user, please try after sometime"
                    }, 500
         return {"message": "You have registered successfully"}, 201
+
+
+class User(Resource):
+    @jwt_required
+    def get(self):
+        user_id = get_jwt_identity()
+        user: UserModel = UserModel.get_user_by_id(user_id)
+        if user:
+            return user.json()
+        return {
+            "message": "User does not exists"
+        },404
+
 
 
 class UserLogin(Resource):
