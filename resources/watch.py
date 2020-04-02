@@ -80,7 +80,7 @@ class Watch(Resource):
         data = parser.parse_args()
         media_id = data['id']
         media_type = data['media_type']
-        media: WatchModel = WatchModel.get_favourite(user_id,
+        media: WatchModel = WatchModel.get_watch_item(user_id,
                                                      media_type,
                                                      media_id)
 
@@ -91,10 +91,10 @@ class Watch(Resource):
             except:
                 return {
                            "errorCode": Error.FAILED_TO_DELETE_FAVOURITE,
-                           "message": "Failed to delete favourite , please try after some time"
+                           "message": "Failed to delete watchlist , please try after some time"
                        }, 500
             return {
-                       "message": "Favourite deleted",
+                       "message": "Watch item deleted",
                        "id": media_id,
                        "media_type": media_type
                    }, 201
@@ -109,7 +109,7 @@ class WatchList(Resource):
     def get(self, media_type):
         if media_type is None:
             return {
-                       "errorCode": Error.FAVOURITE_MISSING_REQUEST,
+                       "errorCode": Error.WATCHLIST_MISSING_REQUEST,
                        "message": "There is problem while login, please try after some time"
                    }, 400
         user_id = get_jwt_identity()

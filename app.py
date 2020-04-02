@@ -2,7 +2,8 @@ import os
 
 from flask import Flask
 from flask_restful import Api
-from resources.user import UserRegister, UserLogin, User, UserLogout
+from resources.user import UserRegister, User, UserLogout
+from resources.login import UserLogin
 from resources.favourite import Favourite, FavouriteList, FavouriteCheck
 from resources.watch import Watch, WatchList, WatchCheck
 from error import Error
@@ -47,7 +48,6 @@ def token_revoked():
         "errorCode": Error.TOKEN_EXPIRED,
         "message": "Your token expired "
     }
-
 
 
 # Register API
