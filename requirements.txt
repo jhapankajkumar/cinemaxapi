@@ -1,5 +1,6 @@
-#//These are the library develper must install before running the server
 Flask
 Flask-RESTFul
 Flask-JWT-Extended
 Flask-SQLAlchemy
+uwsgi
+psycopg2
