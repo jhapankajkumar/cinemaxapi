@@ -18,7 +18,6 @@ class UserModel(db.Model):
 
     def json(self):
         return {
-            "id": self.id,
             "name" : self.name,
             "email": self.email,
             "mobile": self.mobile
@@ -40,4 +39,5 @@ class UserModel(db.Model):
 
     @classmethod
     def get_user_by_id(cls, _id):
-        return cls.query.filter_by(_id).first()
+        print("USER-ID", _id)
+        return cls.query.filter_by(id=_id).first()

@@ -75,8 +75,4 @@ class User(Resource):
         },404
 
 
-class UserLogout(Resource):
-    @jwt_required
-    def post(self):
-        user_id = get_jwt_identity()
 
