@@ -22,13 +22,14 @@ class UserLogin(Resource):
         data = self._parser.parse_args()
         session['email'] = data['email']
         try:
-            user = UserModel.get_user_from_email(data['email'])
+            user:UserModel = UserModel.get_user_from_email(data['email'])
             if user and safe_str_cmp(user.password, data['password']):
                 access_token = create_access_token(identity=user.id, fresh=True)
                 refresh_token = create_refresh_token(identity=user.id)
                 return {
                            "access_token": access_token,
-                           "refresh_token": refresh_token
+                           "refresh_token": refresh_token,
+                            "user" : user.json()
                        }, 200
             else:
                 return {
