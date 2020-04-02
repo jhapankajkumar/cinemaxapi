@@ -6,6 +6,7 @@ from resources.user import UserRegister, User, UserLogout
 from resources.login import UserLogin
 from resources.favourite import Favourite, FavouriteList, FavouriteCheck
 from resources.watch import Watch, WatchList, WatchCheck
+from resources.rating import MediaRating
 from error import Error
 from flask_jwt_extended import JWTManager
 
@@ -71,6 +72,9 @@ api.add_resource(Favourite, "/favourite")
 api.add_resource(WatchList, "/watchlist/<string:media_type>")
 api.add_resource(WatchCheck, "/watch/<int:media_id>")
 api.add_resource(Watch, "/watch")
+
+# Rate
+api.add_resource(MediaRating, "/rate/<int:media_id>")
 
 if __name__ == '__main__':
     from db import db
