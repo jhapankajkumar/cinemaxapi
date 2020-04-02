@@ -31,7 +31,9 @@ class Error:
     # Token Error
     TOKEN_EXPIRED = "70002"
     TOKEN_INVALID = "70003"
-    TOKEN_UNAUTHORIZED = "70004"
+    TOKEN_UNAUTHORIZED = "70004",
+    TOKEN_MISSING = "70005",
+    TOKEN_REVOKED = "70006"
 
 
 

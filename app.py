@@ -9,11 +9,15 @@ from resources.favourite import Favourite, FavouriteList, FavouriteCheck
 from resources.watch import Watch, WatchList, WatchCheck
 from resources.rating import MediaRating
 from resources.change_password import ChangePassword
-from error import Error
+from error import  Error
+
+from blacklist import BLACKLIST
 from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 jwt = JWTManager(app)
+
+
 
 app.secret_key = 'cinemaxapi'
 
@@ -22,11 +26,20 @@ app.config['DEBUG'] = True
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['JWT_BLACKLIST_ENABLED'] = True  # enable blacklist feature
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']  # allow blacklisting for access and refresh tokens
 
 
 @app.route("/")
 def home():
     return "Welcome to Cinemax API"
+
+
+# This method will check if a token is blacklisted, and will be called automatically when blacklist is enabled
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    return decrypted_token['jti'] in BLACKLIST  # Here we blacklist particular JWTs that have been created in the past.
 
 
 # The following callbacks are used for customizing jwt response/error messages.
@@ -35,7 +48,8 @@ def home():
 def expired_token_callback():
     return jsonify({
         'message': 'The token has expired.',
-        'error': 'token_expired'
+        'error': 'token_expired',
+        'code': Error.TOKEN_EXPIRED
     }), 401
 
 
@@ -43,7 +57,8 @@ def expired_token_callback():
 def invalid_token_callback(error):  # we have to keep the argument here, since it's passed in by the caller internally
     return jsonify({
         'message': 'Signature verification failed.',
-        'error': 'invalid_token'
+        'error': 'invalid_token',
+        'code': Error.TOKEN_INVALID
     }), 401
 
 
@@ -51,7 +66,8 @@ def invalid_token_callback(error):  # we have to keep the argument here, since i
 def missing_token_callback(error):
     return jsonify({
         "description": "Request does not contain an access token.",
-        'error': 'authorization_required'
+        'error': 'authorization_required',
+        'code': Error.TOKEN_MISSING
     }), 401
 
 
@@ -67,7 +83,8 @@ def token_not_fresh_callback():
 def revoked_token_callback():
     return jsonify({
         "description": "The token has been revoked.",
-        'error': 'token_revoked'
+        'error': 'token_revoked',
+        'code': Error.TOKEN_REVOKED
     }), 401
 
 
@@ -97,7 +114,6 @@ api.add_resource(Watch, "/watch")
 
 # Rate
 api.add_resource(MediaRating, "/rate/<int:media_id>")
-
 
 
 if __name__ == '__main__':
